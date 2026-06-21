@@ -801,34 +801,31 @@ const CONFIG = {
 /* ==========================================================
    API
 ========================================================== */
-async function api(action,data={}){
+async function api(action, data = {}) {
 
     showLoading();
 
-    try{
+    try {
 
-        const response=await fetch(
+        const response = await fetch(CONFIG.API_URL, {
 
-            CONFIG.API_URL,
+            method: "POST",
 
-            {
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-                method:"POST",
+            body: JSON.stringify({
 
-                body:JSON.stringify({
+                action: action,
 
-                    action,
+                ...data
 
-                    ...data
+            })
 
-                })
+        });
 
-            }
-
-        );
-
-        const json=
-            await response.json();
+        const json = await response.json();
 
         hideLoading();
 
@@ -836,13 +833,21 @@ async function api(action,data={}){
 
     }
 
-    catch(e){
+    catch (err) {
 
         hideLoading();
 
-        toast("Network Error","error");
+        console.error(err);
 
-        console.error(e);
+        toast("Unable to connect to server.");
+
+        return {
+
+            success: false,
+
+            message: "Network Error"
+
+        };
 
     }
 
