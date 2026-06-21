@@ -995,15 +995,15 @@ function toast(message,type="success"){
 /* ==========================================================
    INITIALIZE
 ========================================================== */
-document
-.getElementById("loginBtn")
-.addEventListener(
+document.addEventListener("DOMContentLoaded", () => {
 
-    "click",
+    const btn = document.getElementById("loginBtn");
 
-    login
+    if (btn) {
+        btn.addEventListener("click", login);
+    }
 
-);
+});
 </script>
 
 </body>
