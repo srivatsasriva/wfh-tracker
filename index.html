@@ -787,19 +787,128 @@ label{
 /* ==========================================================
    CONFIG
 ========================================================== */
+const CONFIG = {
 
+    API_URL: "https://script.google.com/macros/s/AKfycbwZuQYmHSDfAQWsUcJWwQQkl-GIkCbG5tGVM00SHUWl07s3whSmsmtPKu8ldnoq7Vd7/exec",
+
+    STORAGE_KEY: "wfh_tracker_session",
+
+    APP_NAME: "WFH Tracker"
+
+};
 
 
 /* ==========================================================
    API
 ========================================================== */
+async function api(action,data={}){
 
+    showLoading();
+
+    try{
+
+        const response=await fetch(
+
+            CONFIG.API_URL,
+
+            {
+
+                method:"POST",
+
+                body:JSON.stringify({
+
+                    action,
+
+                    ...data
+
+                })
+
+            }
+
+        );
+
+        const json=
+            await response.json();
+
+        hideLoading();
+
+        return json;
+
+    }
+
+    catch(e){
+
+        hideLoading();
+
+        toast("Network Error","error");
+
+        console.error(e);
+
+    }
+
+}
 
 
 /* ==========================================================
    AUTH
 ========================================================== */
+async function login(){
 
+    const username=
+        document
+        .getElementById("username")
+        .value
+        .trim();
+
+    const password=
+        document
+        .getElementById("password")
+        .value;
+
+    if(!username||!password){
+
+        toast("Enter username & password");
+
+        return;
+
+    }
+
+    const response=
+        await api(
+
+            "login",
+
+            {
+
+                username,
+
+                password,
+
+                device:navigator.userAgent
+
+            }
+
+        );
+
+    if(!response.success){
+
+        toast(response.message);
+
+        return;
+
+    }
+
+    localStorage.setItem(
+
+        CONFIG.STORAGE_KEY,
+
+        response.data.sessionToken
+
+    );
+
+    toast("Login Successful");
+
+}
 
 
 /* ==========================================================
@@ -835,7 +944,41 @@ label{
 /* ==========================================================
    UI
 ========================================================== */
+function showLoading(){
 
+    document
+        .getElementById("loadingScreen")
+        .classList.add("show");
+
+}
+
+function hideLoading(){
+
+    document
+        .getElementById("loadingScreen")
+        .classList.remove("show");
+
+}
+
+function toast(message,type="success"){
+
+    const t=document.createElement("div");
+
+    t.className="toast";
+
+    t.innerHTML=message;
+
+    document
+        .getElementById("toastContainer")
+        .appendChild(t);
+
+    setTimeout(()=>{
+
+        t.remove();
+
+    },3000);
+
+}
 
 
 /* ==========================================================
@@ -847,7 +990,15 @@ label{
 /* ==========================================================
    INITIALIZE
 ========================================================== */
+document
+.getElementById("loginBtn")
+.addEventListener(
 
+    "click",
+
+    login
+
+);
 </script>
 
 </body>
